@@ -1,0 +1,28 @@
+{
+  "name": "itelective4-sneakerproject",
+  "version": "1.0.0",
+  "description": "this is the final summative assesment in it elective 4",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GerardCons"
+  },
+  "keywords": [
+    "express",
+    "webapp",
+    "elective4",
+    "FSA",
+    "bootstrap",
+    "nodeapp"
+  ],
+  "author": "Gerard Consolacion",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^3.1.6",
+    "express": "^4.17.2",
+    "firebase-admin": "^10.0.2"
+  }
+}

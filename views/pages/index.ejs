@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../partials/head'); %>
+</head>
+<body>
+    <!-- navbar -->
+        <%- include('../partials/header'); %>
+    <!-- end of navbar -->
+
+    <!-- hero -->
+        <%- include('../partials/hero'); %>
+    <!-- end of hero -->
+
+
+<!-- collection -->
+<section id = "collection" class = "py-5">
+    <div class = "container">
+        <div class = "title text-center">
+            <h1 class = "">New Collection</h1>
+        </div>
+        <div class = "row g-0">
+            <div class = "collection-list mt-4 row gx-0 gy-3">
+                <% for(var i = 0; i < itemData.length; i++){ %>
+                <div class = "col-md-6 col-lg-4 col-xl-3 p-2 new">
+                    <div class = "collection-img position-relative text-center">
+                        <img src="<%= itemData[i].data()['image_url'] %>"  class = "w-100 h-auto">
+                        <span class = "position-absolute bg-dark text-white d-flex align-items-center justify-content-center"><%=itemData[i].data()['stocks'] %></span>
+                    </div>
+                    <div class = "text-center">
+                        <h5><%= itemData[i].data()['name'] %></h5>
+                        <h5><%= itemData[i].data()['style'] %></h5>
+                        <p class="card-text"><%= "Php " + itemData[i].data()['price'] + ".00" %></p><a href="#" class="btn cart px-auto">ADD TO CART</a>
+                    </div>
+                </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- end of collection -->
+
+<!-- Offers -->
+<%- include('../partials/offers'); %>
+<!-- end of Offers -->
+
+    <!-- blogs -->
+        <%- include('../partials/blogs'); %>
+    <!-- end of blogs -->
+
+    <!-- about us -->
+        <%- include('../partials/aboutus'); %>
+    <!-- end of about us -->
+
+        <!-- footer -->
+            <%- include('../partials/footer'); %>
+        <!-- end of footer -->
+
+    <!-- Script -->
+    <%- include('../partials/script'); %> 
+    <!-- end of Script -->
+</body>
+</html>
