@@ -34,4 +34,8 @@ app.get('/', async function (req, res) {
     res.render('pages/index', data);
 });
 
+app.get('/cart',(req,res) => {
+    res.render('pages/cart');
+});
+
 app.listen(port);
