@@ -1,5 +1,10 @@
 var express = require('express');
 var app = express();
+var bodyParser = require('body-parser');
+var cors = require('cors');
+
+app.use(bodyParser.json());
+app.use(cors())
 
 app.set('view engine', 'ejs');
 
@@ -30,12 +35,80 @@ app.get('/', async function (req, res) {
         array: [
             { fname: "Dodong", lname: "Laboriki" }
         ],
-    }
+    }    
     res.render('pages/index', data);
 });
 
-app.get('/cart',(req,res) => {
-    res.render('pages/cart');
+app.get('/cart',async (req,res) => {
+    const items = await db.collection('cart').get();
+    var total = 0
+    var length = items.docs.length
+    items.docs.forEach(item => {
+        total += item.data()['subtotal']
+    })
+    let data = {
+        items : items.docs,
+        total,
+        length
+    }    
+    res.render('pages/cart', data);
 });
+app.post('/cart', bodyParser.urlencoded({ extended: false }), async(req, res) => {
+    await db.collection('cart').add(req.body)
+    const items = await db.collection('cart').get();
+    var total = 0
+    items.docs.forEach(item => {
+        total += item.data()['subtotal']
+    })
+    let data = {
+        items : items.docs,
+        total,
+        length
+    }     
+    res.render('pages/cart', data);
+})
+app.put('/cart/:id', bodyParser.urlencoded({ extended: false }), async(req, res) => {    
+    var doc = await db.collection('cart').doc(req.params.id).get();    
+    if(req.body.operation == 'add'){
+        var newQty = doc.data()['qty'] + 1;
+        await db.collection('cart').doc(req.params.id).set({
+            qty: newQty,
+            subtotal : doc.data()['price'] * newQty
+        }, { merge: true })
+    }
+    else{
+        var newQty = doc.data()['qty'] - 1;
+        await db.collection('cart').doc(req.params.id).set({
+            qty: newQty,
+            subtotal : doc.data()['price'] * newQty
+        }, { merge: true })
+    }
+    const items = await db.collection('cart').get();
+    var total = 0
+    items.docs.forEach(item => {
+        total += item.data()['subtotal']
+    })
+    let data = {
+        items : items.docs,
+        total,
+        length
+    }         
+    res.render('pages/cart', data)
+})
+
+app.delete('/cart/:id', bodyParser.urlencoded({ extended: false }), async(req, res) => {    
+   await db.collection('cart').doc(req.params.id).delete()
+    const items = await db.collection('cart').get();
+    var total = 0
+    items.docs.forEach(item => {
+        total += item.data()['subtotal']
+    })
+    let data = {
+        items : items.docs,
+        total,
+        length
+    }        
+    res.render('pages/cart', data)
+})
 
 app.listen(port);

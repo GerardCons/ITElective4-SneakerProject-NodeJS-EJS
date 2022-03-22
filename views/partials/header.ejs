@@ -6,7 +6,7 @@
         </a>
 
         <div class = "order-lg-2 nav-btns">
-            <button type="button" class="btn position-relative">
+            <button type="button" class="btn position-relative" onclick="toCart()">
                 <i class="fa fa-shopping-cart fa-2x" alt="shopIcon"></i>
                 <span class="position-absolute top-0 start-100 translate-middle badge bg-danger">5</span>
             </button>
@@ -34,3 +34,8 @@
         </div>
     </div>
 </nav>
+<script>
+    function toCart(){
+        window.location.href = "http://localhost:8080/cart";
+    }
+</script>

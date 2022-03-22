@@ -23,21 +23,24 @@
                         <div class="col">
                             <h4><b>Shopping Cart</b></h4>
                         </div>
-                        <div class="col align-self-center text-end text-muted">3 items</div>
+                        <div class="col align-self-center text-end text-muted"><%= length %>  items</div>
                     </div>
                 </div>
+                <% for(var i=0; i < items.length; i++) { %>
                 <div class="row border-top border-bottom">
                     <div class="row main align-items-center">
-                        <div class="col-2"><img class="img-fluid" src="images/pictures/s_AJ1High.jpg"></div>
+                        <div class="col-2"><img class="img-fluid" src="<%= items[i].data()['image_url'] %>"></div>
                         <div class="col">
-                            <div class="row">Air Jordan 1 High</div>
-                            <div class="row">Varsity Red</div>
+                            <h3 hidden><%= items[i].id %></h3>
+                            <div class="row"><%= items[i].data()['name'] %></div>
+                            <div class="row"><%= items[i].data()['style'] %></div>
                         </div>
-                        <div class="col"> <a href="#" class="updateButton">-</a><a href="#" class="border">1</a><a href="#" class="updateButton">+</a> </div>
-                        <div class="col">Php 8500.00<span class="close float-end">&#10005;</span></div>
+                        <div class="col"> <a class="updateButton" onclick="subtractQty(event)">-</a><%= items[i].data()['qty'] %><a class="updateButton" onclick="addQty(event)">+</a> </div>
+                        <div class="col"><%= items[i].data()['subtotal'] %><span class="close float-end" onclick="deleteItem(event)">&#10005;</span></div>
                     </div>
                 </div>
-                <div class="row">
+                <% } %>
+                <!-- <div class="row">
                     <div class="row main align-items-center">
                         <div class="col-2"><img class="img-fluid" src="images/pictures/s_L8SpaceJam.jpg"></div>
                         <div class="col">
@@ -47,8 +50,8 @@
                         <div class="col"> <a href="#" class="updateButton">-</a><a href="#" class="border">1</a><a href="#" class="updateButton">+</a> </div>
                         <div class="col">Php 10400.00<span class="close float-end">&#10005;</span></div>
                     </div>
-                </div>
-                <div class="row border-top border-bottom">
+                </div> -->
+                <!-- <div class="row border-top border-bottom">
                     <div class="row main align-items-center">
                         <div class="col-2"><img class="img-fluid" src="images/pictures/s_DunkLow.jpg"></div>
                         <div class="col">
@@ -58,7 +61,7 @@
                         <div class="col"> <a href="#" class="updateButton">-</a><a href="#" class="border">1</a><a href="#" class="updateButton">+</a> </div>
                         <div class="col">price<span class="close float-end">&#10005;</span></div>
                     </div>
-                </div>
+                </div> -->
                 <div class="back-to-shop"><a href="#">&leftarrow;</a><span class="text-muted">Back to shop</span></div>
             </div>
             <div class="col-md-4 summary">
@@ -68,19 +71,19 @@
                 <hr>
                 <div class="row">
                     <div class="col" style="padding-left:0;">Cart Subtotal</div>
-                    <div class="col text-end">Php 9000.00</div>
+                    <div class="col text-end" id="cart_subtotal">Php <%= total %></div>
                 </div>
                 <form>
-                    <p>SHIPPING</p> <select>
-                        <option class="text-muted">Special-Delivery- Php 1000.00 </option>
-                        <option class="text-muted">Standard-Delivery- Php 500.00 </option>
-                        <option class="text-muted">Discounted-Delivery- Php 200.00 </option>
+                    <p>SHIPPING</p> <select id="deliveryOptions" onchange="deliveryChange(event)">
+                        <option class="text-muted" selected value="1000.00">Special-Delivery- Php 1000.00 </option>
+                        <option class="text-muted" value="500.00">Standard-Delivery- Php 500.00 </option>
+                        <option class="text-muted" value="200.00">Discounted-Delivery- Php 200.00 </option>
                     </select>
                     <p>GIVE CODE</p> <input id="code" placeholder="Enter your code">
                 </form>
                 <div class="row" style="border-top: 1px solid rgba(0,0,0,.1); padding: 2vh 0;">
                     <div class="col">TOTAL PRICE</div>
-                    <div class="col text-end">Php 10000.00</div>
+                    <div class="col text-end" id="totalPrice">Php 10000.00</div>
                 </div> <button class="btn">CHECKOUT</button>
             </div>
         </div>
@@ -92,4 +95,63 @@
     <%- include('../partials/script'); %> 
     <!-- end of Script -->
 </body>
+<script>
+    window.addEventListener('load', () => {
+        var cart_subtotal = document.getElementById('cart_subtotal').innerText.split("Php ")[1]
+        var deliveryOptions = document.getElementById('deliveryOptions').value;
+        var totalPrice = document.getElementById('totalPrice')
+        totalPrice.innerText = `Php ${parseFloat(cart_subtotal) + parseFloat(deliveryOptions)}`        
+    })
+    function deliveryChange(e){
+        var cart_subtotal = document.getElementById('cart_subtotal').innerText.split("Php ")[1]
+        var deliveryOptions = document.getElementById('deliveryOptions').value;
+        var totalPrice = document.getElementById('totalPrice')
+        totalPrice.innerText = `Php ${parseFloat(cart_subtotal) + parseFloat(deliveryOptions)}`    
+    }
+    async function addQty(e){            
+        var cart_id = e.target.parentElement.previousElementSibling.firstElementChild.innerText
+        var addData = {
+            cart_id,
+            operation: 'add'
+        };
+        const res = await fetch('http://localhost:8080/cart/' + cart_id, { 
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: JSON.stringify(addData),
+            method: 'PUT'
+        });
+
+        window.location.href = 'http://localhost:8080/cart'
+
+    }
+
+    async function subtractQty(e){
+        var qty = e.target.parentElement.innerText.split('')[1]
+        if(parseInt(qty) != 1){
+            var cart_id = e.target.parentElement.previousElementSibling.firstElementChild.innerText
+            var subtractData = {
+                cart_id,
+                operation: 'subtract'
+            };
+            const res = await fetch('http://localhost:8080/cart/' + cart_id, { 
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify(subtractData),
+                method: 'PUT'
+            });
+
+            window.location.href = 'http://localhost:8080/cart'
+        }
+        
+    }
+    async function deleteItem(e){
+        var cart_id = e.target.parentElement.previousElementSibling.previousElementSibling.firstElementChild.innerText    
+        const res = await fetch('http://localhost:8080/cart/' + cart_id, {            
+            method: 'DELETE'
+        }); 
+        window.location.href = 'http://localhost:8080/cart'   
+    }
+</script>
 </html>

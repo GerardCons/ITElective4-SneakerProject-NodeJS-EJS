@@ -24,13 +24,14 @@
                 <% for(var i = 0; i < itemData.length; i++){ %>
                 <div class = "col-md-6 col-lg-4 col-xl-3 p-2 new">
                     <div class = "collection-img position-relative text-center">
-                        <img src="<%= itemData[i].data()['image_url'] %>"  class = "w-100 h-auto">
+                        <img id="item_image_url" src="<%= itemData[i].data()['image_url'] %>"  class = "w-100 h-auto">
                         <span class = "position-absolute bg-dark text-white d-flex align-items-center justify-content-center"><%=itemData[i].data()['stocks'] %></span>
                     </div>
                     <div class = "text-center">
-                        <h5><%= itemData[i].data()['name'] %></h5>
-                        <h5><%= itemData[i].data()['style'] %></h5>
-                        <p class="card-text"><%= "Php " + itemData[i].data()['price'] + ".00" %></p><a href="#" class="btn cart px-auto">ADD TO CART</a>
+                        <h5 id="item_id" hidden><%= itemData[i].id %></h5>
+                        <h5 id="item_name"><%= itemData[i].data()['name'] %></h5>
+                        <h5 id="item_style"><%= itemData[i].data()['style'] %></h5>
+                        <p class="card-text" id="item_price"><%= "Php " + itemData[i].data()['price'] + ".00" %></p><a class="btn cart px-auto" onclick="addToCart(event)">ADD TO CART</a>
                     </div>
                 </div>
                 <% } %>
@@ -60,4 +61,34 @@
     <%- include('../partials/script'); %> 
     <!-- end of Script -->
 </body>
+<script>
+    async function addToCart(e){        
+        var item_id = e.target.parentElement.firstElementChild.innerText        
+        var item_name = e.target.parentElement.firstElementChild.nextElementSibling.innerText
+        var item_style = e.target.parentElement.firstElementChild.nextElementSibling.nextElementSibling.innerText
+        var item_price = e.target.previousElementSibling.innerText
+        var item_image_url = e.target.parentElement.previousElementSibling.firstElementChild.src       
+        var newData = {
+            item_id : item_id,
+            name : item_name,
+            style : item_style,
+            price : parseFloat(item_price.split("Php ")[1]),
+            subtotal : parseFloat(item_price.split("Php ")[1]) * 1,
+            image_url : item_image_url,
+            qty : 1  
+        }
+
+        const res = await fetch('http://localhost:8080/cart', {
+            headers: {
+                'Content-type' : 'application/json'
+            },
+            method: 'POST',
+            body: JSON.stringify(newData)
+        })
+
+        window.location.href = 'http://localhost:8080/cart'
+
+        
+    }
+</script>
 </html>
